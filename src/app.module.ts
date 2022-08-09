@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 const HOST:string = process.env.MONGODB_HOST || 'localhost';
 const PORT:string = process.env.MONGODB_PORT || '27017';
@@ -13,6 +14,7 @@ const URI:string = `mongodb://${HOST}:${PORT}/${DATABASE}`;
   imports: [
     MongooseModule.forRoot(URI),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

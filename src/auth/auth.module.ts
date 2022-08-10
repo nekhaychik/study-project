@@ -6,7 +6,7 @@ import { JwtStrategy } from './passport/jwt.strategy';
 import { JWTService } from './jwt.service';
 import { MailService } from './mail.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ForgottenPasswordSchema } from 'src/models/forgottenpassword.schema';
+import { ForgottenPasswordSchema } from './schemas/forgottenpassword.schema';
 
 @Module({
   imports: [
@@ -15,7 +15,12 @@ import { ForgottenPasswordSchema } from 'src/models/forgottenpassword.schema';
       { name: 'ForgottenPassword', schema: ForgottenPasswordSchema },
     ]),
   ],
-  providers: [AuthService, JwtStrategy, JWTService, MailService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JWTService,
+    MailService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

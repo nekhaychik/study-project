@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import config from 'src/config';
+import { ForgottenPasswordDB } from './interfaces/forgottenpassword.interface';
 
 @Injectable()
 export class MailService {
-  async sendEmail(email, tokenModel) {
-    let transporter = nodemailer.createTransport({
-      host: 'localhos',
-      port: 587,
-      secure: false,
+  async sendEmail(email: string, tokenModel: ForgottenPasswordDB): Promise<boolean> {
+    const transporter = nodemailer.createTransport({
+      host: config.mail.host,
+      port: config.mail.port,
+      secure: config.mail.secure,
       auth: {
         user: config.mail.user,
         pass: config.mail.pass,
       },
     });
 
-    let mailOptions = {
+    const mailOptions = {
       from: '"Company" <' + config.mail.user + '>', 
       to: email, // list of receivers (separated by ,)
       subject: 'Frogotten Password', 
@@ -24,7 +25,7 @@ export class MailService {
       '<a href='+ config.host.url + ':' + config.host.port +'/auth/reset-password/'+ tokenModel.newPasswordToken + '>Click here</a>'  // html body
     };
 
-    let sent = await new Promise<boolean>(async function(resolve, reject) {
+    const sent = await new Promise<boolean>(async function(resolve, reject) {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {      
           console.log('Message sent: %s', error);
@@ -33,7 +34,7 @@ export class MailService {
         console.log('Message sent: %s', info.messageId);
         resolve(true);
       });      
-    })
+    });
     return sent;
   }
 }

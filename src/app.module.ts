@@ -5,10 +5,10 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 
-const HOST:string = process.env.MONGODB_HOST || 'localhost';
-const PORT:string = process.env.MONGODB_PORT || '27017';
-const DATABASE:string = process.env.MONGODB_DATABASE || 'test';
-const URI:string = `mongodb://${HOST}:${PORT}/${DATABASE}`;
+const HOST: string = process.env.MONGODB_HOST || 'localhost';
+const PORT: string = process.env.MONGODB_PORT || '27017';
+const DATABASE: string = process.env.MONGODB_DATABASE || 'test';
+const URI: string = `mongodb://${HOST}:${PORT}/${DATABASE}`;
 
 @Module({
   imports: [

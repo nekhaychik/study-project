@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { LoginDTO } from 'src/auth/dto/login.dto';
 import { Payload } from 'src/auth/interfaces/jwt-payload.interface';
-import { User } from 'src/types/user';
-import { RegisterDTO } from './register.dto';
+import { User, UserDB } from './interfaces/user.inerface';
+import { RegisterDTO } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,44 +13,37 @@ export class UserService {
     @InjectModel('User') private userModel: Model<User>,
   ) {}
 
-  async create(RegisterDTO: RegisterDTO) {
+  async create(RegisterDTO: RegisterDTO): Promise<UserDB> {
     const { email } = RegisterDTO;
-    const user = await this.userModel.findOne({ email });
+    const user: UserDB = await this.userModel.findOne({ email });
     if (user) {
-      throw new HttpException('User already exist', HttpStatus.BAD_REQUEST);
+      throw new HttpException('REGISTER.USER_ALREADY_EXIST', HttpStatus.BAD_REQUEST);
     }
-    const createdUser = new this.userModel(RegisterDTO);
+    const createdUser: UserDB = new this.userModel(RegisterDTO);
     await createdUser.save();
     return this.sanitizeUser(createdUser);
   }
 
-  async updatePassword(payload: Payload) {
-    const { email } = payload;
-  
-    const user = await this.userModel.findOne({ email });
-    
-  }
-
-  async findByPayload(payload: Payload) {
+  async findByPayload(payload: Payload): Promise<UserDB> {
     const { email } = payload;
     return await this.userModel.findOne({ email });
   }
 
-  async findByLogin(UserDTO: LoginDTO) {
+  async findByLogin(UserDTO: LoginDTO): Promise<UserDB> {
     const { email, password } = UserDTO;
-    const user = await this.userModel.findOne({ email });
+    const user: UserDB = await this.userModel.findOne({ email });
     if (!user) {
-      throw new HttpException('User does not exist', HttpStatus.BAD_REQUEST);
+      throw new HttpException('LOGIN.USER_DOES_NOT_EXIST', HttpStatus.BAD_REQUEST);
     }
     if (await bcrypt.compare(password, user.password)) {
       return this.sanitizeUser(user);
     } else {
-      throw new HttpException('Invalid credential', HttpStatus.BAD_REQUEST);
+      throw new HttpException('LOGIN.INVALID_CREDENTIAL', HttpStatus.BAD_REQUEST);
     }
   }
 
-  sanitizeUser(user: User) {
-    const sanitized = user.toObject();
+  sanitizeUser(user: UserDB): UserDB {
+    const sanitized: UserDB = user.toObject();
     delete sanitized['password'];
     return sanitized;
   }

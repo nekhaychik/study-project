@@ -4,7 +4,7 @@ import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import { ForgottenPassword } from './interfaces/forgottenpassword.interface';
 import { Payload } from './interfaces/jwt-payload.interface';
-import { User } from 'src/types/user';
+import { User } from 'src/user/interfaces/user.inerface';
 import { UserService } from 'src/user/user.service';
 import { MailService } from './mail.service';
 

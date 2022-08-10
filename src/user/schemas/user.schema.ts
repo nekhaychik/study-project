@@ -7,7 +7,7 @@ export const UserSchema = new mongoose.Schema({
     type: String,
     unique: true,
     require: true,
-    validate: [isEmail, 'Invalid email'],
+    validate: [isEmail, 'INVALID_EMAIL'],
   },
   password: { type: String, require: true },
 });
@@ -26,4 +26,4 @@ UserSchema.pre(
       return next(err);
     }
   }
-)
+);

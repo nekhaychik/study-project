@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { RegisterDTO } from 'src/user/register.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
@@ -10,6 +11,17 @@ export class AuthController {
     private userService: UserService,
     private authSevice: AuthService,
   ) {}
+
+  @Get('/onlyauth')
+  @UseGuards(AuthGuard('jwt'))
+  async hiddenInformation() {
+    return 'hidden information';
+  }
+
+  @Get('/anyone')
+  async publicInformation() {
+    return 'this can be seen anyone';
+  }
 
   @Post('register')
   async register(@Body() RegisterDTO: RegisterDTO) {

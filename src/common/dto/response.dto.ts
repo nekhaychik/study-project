@@ -1,5 +1,7 @@
 // success: true => message, data
 // success: false => errorMessage, error
+
+// Interfaces
 import { IResponse } from '../interfaces/response.interface';
 
 export class ResponseError implements IResponse {
@@ -9,9 +11,9 @@ export class ResponseError implements IResponse {
     this.data = data;
     console.warn(new Date().toString() + ' - [Response]: ' + infoMessage + (data ? ' - ' + JSON.stringify(data): ''));
   };
-  message: string;
-  data: any[];
-  errorMessage: any;
+  public message: string;
+  public data: any[];
+  public errorMessage: any;
   error: any;
   success: boolean;
 }

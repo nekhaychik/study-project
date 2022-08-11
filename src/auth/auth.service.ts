@@ -1,12 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
-import { ForgottenPassword } from './interfaces/forgottenpassword.interface';
+
+// Interfaces
+import { ForgottenPassword, ForgottenPasswordDB } from './interfaces/forgottenpassword.interface';
 import { Payload } from './interfaces/jwt-payload.interface';
-import { User } from 'src/user/interfaces/user.inerface';
+import { User, UserDB } from 'src/user/interfaces/user.inerface';
+import { IToken } from './interfaces/token.interface';
+
+// Services
 import { UserService } from 'src/user/user.service';
 import { MailService } from './mail.service';
+import { JWTService } from './jwt.service';
+
+// DTO
+import { LoginDTO } from './dto/login.dto';
+import { RegisterDTO } from 'src/user/dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,22 +24,30 @@ export class AuthService {
     @InjectModel('ForgottenPassword') private readonly forgottenPasswordModel: Model<ForgottenPassword>,
     private userService: UserService,
     private mailService: MailService,
+    private jwtService: JWTService,
   ) {}
 
-  async signPayload(payload: Payload) {
-    return sign(payload, process.env.SECRET_KEY,  { expiresIn: '7d' });
+  public async login(UserDTO: LoginDTO): Promise<{ token: IToken; user: UserDB; }> {
+    const userDB: UserDB = await this.userService.findByLogin(UserDTO);
+    const token: IToken = await this.jwtService.createToken(UserDTO.email);
+    return { token, user: userDB };
   }
 
-  async validateUser(payload: Payload) {
+  public async register(UserDTO: RegisterDTO): Promise<UserDB> {
+    const newUser: UserDB = await this.userService.create(UserDTO);
+    return newUser;
+  }
+
+  public async validateUser(payload: Payload) {
     return await this.userService.findByPayload(payload);
   }
 
-  async createForgottenPasswordToken(email: string) {
-    let forgottenPassword = await this.forgottenPasswordModel.findOne({ email });
+  public async createForgottenPasswordToken(email: string): Promise<ForgottenPasswordDB> {
+    const forgottenPassword: ForgottenPasswordDB = await this.forgottenPasswordModel.findOne({ email });
     if (forgottenPassword && ((new Date().getTime() - forgottenPassword.timestamp.getTime()) / 60000 < 15 )) {
       throw new HttpException('RESET_PASSWORD.EMAIL_SENT_RECENTLY', HttpStatus.INTERNAL_SERVER_ERROR);
     } else {
-      let forgottenPasswordModel = await this.forgottenPasswordModel.findOneAndUpdate(
+      const forgottenPasswordModel: ForgottenPasswordDB = await this.forgottenPasswordModel.findOneAndUpdate(
         { email: email },
         { 
           email: email,
@@ -47,12 +64,12 @@ export class AuthService {
     }
   }
 
-  async sendEmailForgotPassword(email: string): Promise<boolean> {
-    var userFromDb = await this.userModel.findOne({ email });
-    if(!userFromDb) throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-
-    var tokenModel = await this.createForgottenPasswordToken(email);
-
+  public async sendEmailForgotPassword(email: string): Promise<boolean> {
+    const userFromDb: UserDB = await this.userModel.findOne({ email });
+    if (!userFromDb) {
+      throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+    const tokenModel: ForgottenPasswordDB = await this.createForgottenPasswordToken(email);
     if(tokenModel && tokenModel.newPasswordToken){
       return this.mailService.sendEmail(email, tokenModel);
     } else {

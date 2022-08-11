@@ -1,11 +1,21 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+
+// Modules
 import { UserModule } from 'src/user/user.module';
-import { JwtStrategy } from './passport/jwt.strategy';
+import { MongooseModule } from '@nestjs/mongoose';
+
+// Services
+import { AuthService } from './auth.service';
 import { JWTService } from './jwt.service';
 import { MailService } from './mail.service';
-import { MongooseModule } from '@nestjs/mongoose';
+
+// Controllers
+import { AuthController } from './auth.controller';
+
+// Strategies
+import { JwtStrategy } from './passport/jwt.strategy';
+
+// Schemas
 import { ForgottenPasswordSchema } from './schemas/forgottenpassword.schema';
 
 @Module({

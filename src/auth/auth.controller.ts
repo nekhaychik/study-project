@@ -1,63 +1,79 @@
-import { Body, Controller, Get, Post, UseGuards, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Param,
+  HttpCode,
+  HttpStatus
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
+// DTO
 import { RegisterDTO } from 'src/user/dto/register.dto';
-import { UserService } from 'src/user/user.service';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
 import { ResponseError, ResponseSuccess } from 'src/common/dto/response.dto';
+
+// Services
+import { AuthService } from './auth.service';
+
+// Interfaces
+import { UserDB } from 'src/user/interfaces/user.inerface';
+import { Payload } from './interfaces/jwt-payload.interface';
+import { IToken } from './interfaces/token.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private userService: UserService,
     private authSevice: AuthService,
   ) {}
 
   @Get('/onlyauth')
   @UseGuards(AuthGuard('jwt'))
-  async hiddenInformation() {
+  public async hiddenInformation(): Promise<string> {
     return 'hidden information';
   }
 
   @Get('/anyone')
-  async publicInformation() {
+  public async publicInformation(): Promise<string> {
     return 'this can be seen anyone';
   }
 
   @Post('register')
-  async register(@Body() RegisterDTO: RegisterDTO) {
-    const user = await this.userService.create(RegisterDTO);
-    const payload = {
-      email: user.email,
-    };
-    const token = await this.authSevice.signPayload(payload);
-    return { user, token };
+  @HttpCode(HttpStatus.OK)
+  public async register(@Body() RegisterDTO: RegisterDTO): Promise<ResponseSuccess | ResponseError> {
+    try {
+      const user: UserDB = await this.authSevice.register(RegisterDTO);
+      return new ResponseSuccess('REGISTER.SUCCESS', { user });
+    } catch (error: any) {
+      return new ResponseError('REGISTER.ERROR', error);
+    }
   }
 
   @Post('login')
-  async login(@Body() UserDTO: LoginDTO) {
-    const user = await this.userService.findByLogin(UserDTO);
-    const payload = {
-      email: user.email,
-    };
-    const token = await this.authSevice.signPayload(payload);
-    return { user, token };
+  @HttpCode(HttpStatus.OK)
+  public async login(@Body() UserDTO: LoginDTO): Promise<ResponseSuccess | ResponseError> {
+    try {
+      const response: Promise <{ token: IToken; user: UserDB; }> = this.authSevice.login(UserDTO);
+      return new ResponseSuccess('LOGIN.SECCESS', response);
+    } catch (error: any) {
+      return new ResponseError('LOGIN.ERROR', error);
+    }
   }
 
 
   @Get('forgot-password/:email')
-  public async sendEmailForgotPassword(@Param() params) {
+  public async sendEmailForgotPassword(@Param() params: Payload): Promise<ResponseSuccess | ResponseError> {
     try {
-      let isEmailSent = await this.authSevice.sendEmailForgotPassword(params.email);
-      if (isEmailSent){
+      const isEmailSent: boolean = await this.authSevice.sendEmailForgotPassword(params.email);
+      if (isEmailSent) {
         return new ResponseSuccess("LOGIN.EMAIL_RESENT", null);
       } else {
         return new ResponseError("REGISTRATION.ERROR.MAIL_NOT_SENT");
       }
-    } catch (error) {
+    } catch (error: any) {
       return new ResponseError("LOGIN.ERROR.SEND_EMAIL", error);
     }
   }
-
 }

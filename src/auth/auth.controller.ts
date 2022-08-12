@@ -58,8 +58,8 @@ export class AuthController {
     @Body() UserDTO: LoginDTO,
   ): Promise<ResponseSuccess | ResponseError> {
     try {
-      const response: Promise<{ token: IToken; user: UserDB }> =
-        this.authSevice.login(UserDTO);
+      const response: { token: IToken; user: UserDB } =
+        await this.authSevice.login(UserDTO);
       return new ResponseSuccess('LOGIN.SECCESS', response);
     } catch (error: any) {
       return new ResponseError('LOGIN.ERROR', error);

@@ -10,4 +10,7 @@ export default {
     url: '<server-url>',
     port: '3000',
   },
+  jwt: {
+    expiresId: 36000000,
+  },
 };

@@ -1,4 +1,4 @@
 export interface IToken {
-  expires_in: string;
+  expires_in: number;
   access_token: string;
 }

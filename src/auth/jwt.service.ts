@@ -2,6 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import config from 'src/config';
 
 // Interfaces
 import { User, UserDB } from 'src/user/interfaces/user.inerface';
@@ -13,7 +14,7 @@ export class JWTService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   public async createToken(email: string): Promise<IToken> {
-    const expiresIn: string = process.env.EXPIRES_IN;
+    const expiresIn: number = config.jwt.expiresId;
     const secretOrKey: string = process.env.SECRET_KEY;
     const userInfo: Payload = { email: email };
     const token: string = jwt.sign(userInfo, secretOrKey, { expiresIn });

@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 
 // DTO
 import { LoginDTO } from 'src/auth/dto/login.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { RegisterDTO } from '../auth/dto/register.dto';
 
 // Interfaces
 import { Payload } from 'src/auth/interfaces/jwt-payload.interface';

@@ -18,7 +18,7 @@ import { JWTService } from './jwt.service';
 
 // DTO
 import { LoginDTO } from './dto/login.dto';
-import { RegisterDTO } from 'src/user/dto/register.dto';
+import { RegisterDTO } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {

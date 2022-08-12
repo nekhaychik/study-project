@@ -1,6 +1,8 @@
 // success: true => message, data
 // success: false => errorMessage, error
 
+import { ApiProperty } from '@nestjs/swagger';
+
 // Interfaces
 import { IResponse } from '../interfaces/response.interface';
 
@@ -16,11 +18,27 @@ export class ResponseError implements IResponse {
         (data ? ' - ' + JSON.stringify(data) : ''),
     );
   }
+
+  @ApiProperty({
+    type: Boolean,
+    nullable: false,
+  })
+  success: boolean;
+
+  @ApiProperty({
+    type: String,
+    nullable: false,
+  })
   public message: string;
+
+  @ApiProperty({
+    type: Object,
+    nullable: false,
+  })
   public data: any[];
+
   public errorMessage: any;
   error: any;
-  success: boolean;
 }
 
 export class ResponseSuccess implements IResponse {
@@ -41,9 +59,26 @@ export class ResponseSuccess implements IResponse {
       } catch (error) {}
     }
   }
-  message: string;
-  data: any[];
-  errorMessage: any;
-  error: any;
+
+  @ApiProperty({
+    type: Boolean,
+    nullable: false,
+  })
   success: boolean;
+
+  @ApiProperty({
+    type: String,
+    nullable: false,
+  })
+  message: string;
+
+  @ApiProperty({
+    type: Object,
+    nullable: false,
+  })
+  data: any[];
+
+  errorMessage: any;
+
+  error: any;
 }

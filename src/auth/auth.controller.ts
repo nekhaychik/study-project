@@ -9,12 +9,20 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 // DTO
 import { LoginDTO } from './dto/login.dto';
 import { ResponseError, ResponseSuccess } from 'src/common/dto/response.dto';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { RegisterDTO } from 'src/user/dto/register.dto';
+import { RegisterDTO } from './dto/register.dto';
 
 // Services
 import { AuthService } from './auth.service';
@@ -24,22 +32,37 @@ import { UserDB } from 'src/user/interfaces/user.inerface';
 import { Payload } from './interfaces/jwt-payload.interface';
 import { IToken } from './interfaces/token.interface';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authSevice: AuthService) {}
 
   @Get('/onlyauth')
+  @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('jwt'))
   public async hiddenInformation(): Promise<string> {
     return 'hidden information';
   }
 
   @Get('/anyone')
+  @ApiExcludeEndpoint()
   public async publicInformation(): Promise<string> {
     return 'this can be seen anyone';
   }
 
   @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBody({ type: [RegisterDTO] })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: ResponseSuccess,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'User with this email already exists',
+    type: ResponseError,
+  })
   @HttpCode(HttpStatus.OK)
   public async register(
     @Body() RegisterDTO: RegisterDTO,
@@ -53,6 +76,23 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'User login' })
+  @ApiBody({ type: [LoginDTO] })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: ResponseSuccess,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'User does not exist',
+    type: ResponseError,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid credential',
+    type: ResponseError,
+  })
   @HttpCode(HttpStatus.OK)
   public async login(
     @Body() UserDTO: LoginDTO,
@@ -67,6 +107,23 @@ export class AuthController {
   }
 
   @Get('forgot-password/:email')
+  @ApiOperation({ summary: 'Send email with password' })
+  @ApiParam({ name: 'email', required: true, description: 'User email' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: ResponseSuccess,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+    type: ResponseError,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'User not registered',
+    type: ResponseError,
+  })
   public async sendEmailForgotPassword(
     @Param() params: Payload,
   ): Promise<ResponseSuccess | ResponseError> {

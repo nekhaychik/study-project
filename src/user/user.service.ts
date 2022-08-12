@@ -13,15 +13,16 @@ import { User, UserDB } from './interfaces/user.inerface';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel('User') private userModel: Model<User>,
-  ) {}
+  constructor(@InjectModel('User') private userModel: Model<User>) {}
 
   public async create(RegisterDTO: RegisterDTO): Promise<UserDB> {
     const { email } = RegisterDTO;
     const user: UserDB = await this.userModel.findOne({ email });
     if (user) {
-      throw new HttpException('REGISTER.USER_ALREADY_EXIST', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'REGISTER.USER_ALREADY_EXIST',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const createdUser: UserDB = new this.userModel(RegisterDTO);
     await createdUser.save();
@@ -37,12 +38,18 @@ export class UserService {
     const { email, password } = UserDTO;
     const user: UserDB = await this.userModel.findOne({ email });
     if (!user) {
-      throw new HttpException('LOGIN.USER_DOES_NOT_EXIST', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'LOGIN.USER_DOES_NOT_EXIST',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (await bcrypt.compare(password, user.password)) {
       return this.sanitizeUser(user);
     } else {
-      throw new HttpException('LOGIN.INVALID_CREDENTIAL', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'LOGIN.INVALID_CREDENTIAL',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

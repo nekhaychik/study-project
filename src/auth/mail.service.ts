@@ -7,7 +7,10 @@ import { ForgottenPasswordDB } from './interfaces/forgottenpassword.interface';
 
 @Injectable()
 export class MailService {
-  public async sendEmail(email: string, tokenModel: ForgottenPasswordDB): Promise<boolean> {
+  public async sendEmail(
+    email: string,
+    tokenModel: ForgottenPasswordDB,
+  ): Promise<boolean> {
     const transporter = nodemailer.createTransport({
       host: config.mail.host,
       port: config.mail.port,
@@ -19,23 +22,30 @@ export class MailService {
     });
 
     const mailOptions = {
-      from: '"Company" <' + config.mail.user + '>', 
+      from: '"Company" <' + config.mail.user + '>',
       to: email, // list of receivers (separated by ,)
-      subject: 'Frogotten Password', 
+      subject: 'Frogotten Password',
       text: 'Forgot Password',
-      html: 'Hi! <br><br> If you requested to reset your password<br><br>'+
-      '<a href='+ config.host.url + ':' + config.host.port +'/auth/reset-password/'+ tokenModel.newPasswordToken + '>Click here</a>'  // html body
+      html:
+        'Hi! <br><br> If you requested to reset your password<br><br>' +
+        '<a href=' +
+        config.host.url +
+        ':' +
+        config.host.port +
+        '/auth/reset-password/' +
+        tokenModel.newPasswordToken +
+        '>Click here</a>', // html body
     };
 
-    const sent = await new Promise<boolean>(async function(resolve, reject) {
+    const sent = await new Promise<boolean>(async function (resolve, reject) {
       return await transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {      
+        if (error) {
           console.log('Message sent: %s', error);
           return reject(false);
         }
         console.log('Message sent: %s', info.messageId);
         resolve(true);
-      });      
+      });
     });
     return sent;
   }

@@ -7,4 +7,4 @@ export interface IResponse {
   errorMessage: string;
   data: any[];
   error: any;
-};
+}

@@ -25,12 +25,7 @@ import { ForgottenPasswordSchema } from './schemas/forgottenpassword.schema';
       { name: 'ForgottenPassword', schema: ForgottenPasswordSchema },
     ]),
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    JWTService,
-    MailService,
-  ],
+  providers: [AuthService, JwtStrategy, JWTService, MailService],
   controllers: [AuthController],
 })
 export class AuthModule {}

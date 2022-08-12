@@ -4,7 +4,8 @@ import { NestFactory } from '@nestjs/core';
 // Modules
 import { AppModule } from './app.module';
 
-require("dotenv").config();
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
 
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);

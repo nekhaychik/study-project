@@ -12,18 +12,15 @@ export const UserSchema = new mongoose.Schema({
   password: { type: String, require: true },
 });
 
-UserSchema.pre(
-  'save',
-  async function(next) {
-    try {
-      if (!this.isModified('password')) {
-        return next();
-      }
-      const hashed: string = await bcrypt.hash(this['password'], 10);
-      this['password'] = hashed;
+UserSchema.pre('save', async function (next) {
+  try {
+    if (!this.isModified('password')) {
       return next();
-    } catch (err) {
-      return next(err);
     }
+    const hashed: string = await bcrypt.hash(this['password'], 10);
+    this['password'] = hashed;
+    return next();
+  } catch (err) {
+    return next(err);
   }
-);
+});

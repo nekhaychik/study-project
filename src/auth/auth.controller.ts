@@ -6,14 +6,15 @@ import {
   UseGuards,
   Param,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 // DTO
-import { RegisterDTO } from 'src/user/dto/register.dto';
 import { LoginDTO } from './dto/login.dto';
 import { ResponseError, ResponseSuccess } from 'src/common/dto/response.dto';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { RegisterDTO } from 'src/user/dto/register.dto';
 
 // Services
 import { AuthService } from './auth.service';
@@ -25,9 +26,7 @@ import { IToken } from './interfaces/token.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authSevice: AuthService,
-  ) {}
+  constructor(private authSevice: AuthService) {}
 
   @Get('/onlyauth')
   @UseGuards(AuthGuard('jwt'))
@@ -42,7 +41,9 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.OK)
-  public async register(@Body() RegisterDTO: RegisterDTO): Promise<ResponseSuccess | ResponseError> {
+  public async register(
+    @Body() RegisterDTO: RegisterDTO,
+  ): Promise<ResponseSuccess | ResponseError> {
     try {
       const user: UserDB = await this.authSevice.register(RegisterDTO);
       return new ResponseSuccess('REGISTER.SUCCESS', { user });
@@ -53,27 +54,32 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  public async login(@Body() UserDTO: LoginDTO): Promise<ResponseSuccess | ResponseError> {
+  public async login(
+    @Body() UserDTO: LoginDTO,
+  ): Promise<ResponseSuccess | ResponseError> {
     try {
-      const response: Promise <{ token: IToken; user: UserDB; }> = this.authSevice.login(UserDTO);
+      const response: Promise<{ token: IToken; user: UserDB }> =
+        this.authSevice.login(UserDTO);
       return new ResponseSuccess('LOGIN.SECCESS', response);
     } catch (error: any) {
       return new ResponseError('LOGIN.ERROR', error);
     }
   }
 
-
   @Get('forgot-password/:email')
-  public async sendEmailForgotPassword(@Param() params: Payload): Promise<ResponseSuccess | ResponseError> {
+  public async sendEmailForgotPassword(
+    @Param() params: Payload,
+  ): Promise<ResponseSuccess | ResponseError> {
     try {
-      const isEmailSent: boolean = await this.authSevice.sendEmailForgotPassword(params.email);
+      const isEmailSent: boolean =
+        await this.authSevice.sendEmailForgotPassword(params.email);
       if (isEmailSent) {
-        return new ResponseSuccess("LOGIN.EMAIL_RESENT", null);
+        return new ResponseSuccess('LOGIN.EMAIL_RESENT', null);
       } else {
-        return new ResponseError("REGISTRATION.ERROR.MAIL_NOT_SENT");
+        return new ResponseError('REGISTRATION.ERROR.MAIL_NOT_SENT');
       }
     } catch (error: any) {
-      return new ResponseError("LOGIN.ERROR.SEND_EMAIL", error);
+      return new ResponseError('LOGIN.ERROR.SEND_EMAIL', error);
     }
   }
 }

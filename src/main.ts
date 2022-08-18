@@ -8,6 +8,8 @@ import { AppModule } from './app.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
+import './common/cron';
+
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
 

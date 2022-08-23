@@ -3,6 +3,7 @@
 /node_modules
 /database
 .env
+db.dump
 
 # Logs
 logs

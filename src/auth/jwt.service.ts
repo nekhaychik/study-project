@@ -5,13 +5,17 @@ import { Model } from 'mongoose';
 import config from 'src/config';
 
 // Interfaces
-import { User, UserDB } from 'src/user/interfaces/user.inerface';
 import { IToken } from './interfaces/token.interface';
 import { Payload } from './interfaces/jwt-payload.interface';
 
+// Schemas
+import { User, UserDocument } from 'src/user/schemas/user.schema';
+
 @Injectable()
 export class JWTService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
   public async createToken(email: string): Promise<IToken> {
     const expiresIn: number = config.jwt.expiresId;
@@ -24,8 +28,8 @@ export class JWTService {
     };
   }
 
-  public async validateUser(signedUser): Promise<UserDB | null> {
-    const userFromDb: UserDB = await this.userModel.findOne({
+  public async validateUser(signedUser): Promise<UserDocument | null> {
+    const userFromDb: UserDocument = await this.userModel.findOne({
       email: signedUser.email,
     });
     if (userFromDb) {

@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import config from 'src/config';
 
-// Interfaces
-import { ForgottenPasswordDB } from './interfaces/forgottenpassword.interface';
+// Schemas
+import { ForgottenPasswordDocument } from './schemas/forgottenpassword.schema';
 
 @Injectable()
 export class MailService {
   public async sendEmail(
     email: string,
-    tokenModel: ForgottenPasswordDB,
+    tokenModel: ForgottenPasswordDocument,
   ): Promise<boolean> {
     const transporter = nodemailer.createTransport({
       host: config.mail.host,

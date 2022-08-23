@@ -3,12 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 // Interfaces
-import {
-  ForgottenPassword,
-  ForgottenPasswordDB,
-} from './interfaces/forgottenpassword.interface';
 import { Payload } from './interfaces/jwt-payload.interface';
-import { User, UserDB } from 'src/user/interfaces/user.inerface';
 import { IToken } from './interfaces/token.interface';
 
 // Services
@@ -20,12 +15,19 @@ import { JWTService } from './jwt.service';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 
+// Schemas
+import { User, UserDocument } from 'src/user/schemas/user.schema';
+import {
+  ForgottenPassword,
+  ForgottenPasswordDocument,
+} from './schemas/forgottenpassword.schema';
+
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-    @InjectModel('ForgottenPassword')
-    private readonly forgottenPasswordModel: Model<ForgottenPassword>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(ForgottenPassword.name)
+    private readonly forgottenPasswordModel: Model<ForgottenPasswordDocument>,
     private userService: UserService,
     private mailService: MailService,
     private jwtService: JWTService,
@@ -33,14 +35,14 @@ export class AuthService {
 
   public async login(
     UserDTO: LoginDTO,
-  ): Promise<{ token: IToken; user: UserDB }> {
-    const userDB: UserDB = await this.userService.findByLogin(UserDTO);
+  ): Promise<{ token: IToken; user: UserDocument }> {
+    const userDB: UserDocument = await this.userService.findByLogin(UserDTO);
     const token: IToken = await this.jwtService.createToken(UserDTO.email);
     return { token, user: userDB };
   }
 
-  public async register(UserDTO: RegisterDTO): Promise<UserDB> {
-    const newUser: UserDB = await this.userService.create(UserDTO);
+  public async register(UserDTO: RegisterDTO): Promise<UserDocument> {
+    const newUser: UserDocument = await this.userService.create(UserDTO);
     return newUser;
   }
 
@@ -50,8 +52,8 @@ export class AuthService {
 
   public async createForgottenPasswordToken(
     email: string,
-  ): Promise<ForgottenPasswordDB> {
-    const forgottenPassword: ForgottenPasswordDB =
+  ): Promise<ForgottenPasswordDocument> {
+    const forgottenPassword: ForgottenPasswordDocument =
       await this.forgottenPasswordModel.findOne({ email });
     if (
       forgottenPassword &&
@@ -63,7 +65,7 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     } else {
-      const forgottenPasswordModel: ForgottenPasswordDB =
+      const forgottenPasswordModel: ForgottenPasswordDocument =
         await this.forgottenPasswordModel.findOneAndUpdate(
           { email: email },
           {
@@ -87,11 +89,11 @@ export class AuthService {
   }
 
   public async sendEmailForgotPassword(email: string): Promise<boolean> {
-    const userFromDb: UserDB = await this.userModel.findOne({ email });
+    const userFromDb: UserDocument = await this.userModel.findOne({ email });
     if (!userFromDb) {
       throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
-    const tokenModel: ForgottenPasswordDB =
+    const tokenModel: ForgottenPasswordDocument =
       await this.createForgottenPasswordToken(email);
     if (tokenModel && tokenModel.newPasswordToken) {
       return this.mailService.sendEmail(email, tokenModel);

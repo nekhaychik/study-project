@@ -1,7 +1,19 @@
-import * as mongoose from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const ForgottenPasswordSchema = new mongoose.Schema({
-  email: String,
-  newPasswordToken: String,
-  timestamp: Date,
-});
+export type ForgottenPasswordDocument = ForgottenPassword & Document;
+
+@Schema()
+export class ForgottenPassword {
+  @Prop()
+  email: string;
+
+  @Prop()
+  newPasswordToken: string;
+
+  @Prop()
+  timestamp: Date;
+}
+
+export const ForgottenPasswordSchema =
+  SchemaFactory.createForClass(ForgottenPassword);

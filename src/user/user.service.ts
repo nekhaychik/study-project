@@ -9,34 +9,34 @@ import { RegisterDTO } from '../auth/dto/register.dto';
 
 // Interfaces
 import { Payload } from 'src/auth/interfaces/jwt-payload.interface';
-import { User, UserDB } from './interfaces/user.inerface';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  public async create(RegisterDTO: RegisterDTO): Promise<UserDB> {
+  public async create(RegisterDTO: RegisterDTO): Promise<UserDocument> {
     const { email } = RegisterDTO;
-    const user: UserDB = await this.userModel.findOne({ email });
+    const user: UserDocument = await this.userModel.findOne({ email });
     if (user) {
       throw new HttpException(
         'REGISTER.USER_ALREADY_EXIST',
         HttpStatus.BAD_REQUEST,
       );
     }
-    const createdUser: UserDB = new this.userModel(RegisterDTO);
+    const createdUser: UserDocument = new this.userModel(RegisterDTO);
     await createdUser.save();
     return this.sanitizeUser(createdUser);
   }
 
-  public async findByPayload(payload: Payload): Promise<UserDB> {
+  public async findByPayload(payload: Payload): Promise<UserDocument> {
     const { email } = payload;
     return await this.userModel.findOne({ email });
   }
 
-  public async findByLogin(UserDTO: LoginDTO): Promise<UserDB> {
+  public async findByLogin(UserDTO: LoginDTO): Promise<UserDocument> {
     const { email, password } = UserDTO;
-    const user: UserDB = await this.userModel.findOne({ email });
+    const user: UserDocument = await this.userModel.findOne({ email });
     if (!user) {
       throw new HttpException(
         'LOGIN.USER_DOES_NOT_EXIST',
@@ -53,8 +53,8 @@ export class UserService {
     }
   }
 
-  public sanitizeUser(user: UserDB): UserDB {
-    const sanitized: UserDB = user.toObject();
+  public sanitizeUser(user: UserDocument): UserDocument {
+    const sanitized: UserDocument = user.toObject();
     delete sanitized['password'];
     return sanitized;
   }

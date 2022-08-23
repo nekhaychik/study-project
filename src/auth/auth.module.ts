@@ -16,13 +16,16 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './passport/jwt.strategy';
 
 // Schemas
-import { ForgottenPasswordSchema } from './schemas/forgottenpassword.schema';
+import {
+  ForgottenPassword,
+  ForgottenPasswordSchema,
+} from './schemas/forgottenpassword.schema';
 
 @Module({
   imports: [
     UserModule,
     MongooseModule.forFeature([
-      { name: 'ForgottenPassword', schema: ForgottenPasswordSchema },
+      { name: ForgottenPassword.name, schema: ForgottenPasswordSchema },
     ]),
   ],
   providers: [AuthService, JwtStrategy, JWTService, MailService],

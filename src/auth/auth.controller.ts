@@ -21,16 +21,17 @@ import {
 // DTO
 import { LoginDTO } from './dto/login.dto';
 import { ResponseError, ResponseSuccess } from 'src/common/dto/response.dto';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { RegisterDTO } from './dto/register.dto';
 
 // Services
 import { AuthService } from './auth.service';
 
 // Interfaces
-import { UserDB } from 'src/user/interfaces/user.inerface';
 import { Payload } from './interfaces/jwt-payload.interface';
 import { IToken } from './interfaces/token.interface';
+
+// Schemas
+import { UserDocument } from 'src/user/schemas/user.schema';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -68,7 +69,7 @@ export class AuthController {
     @Body() RegisterDTO: RegisterDTO,
   ): Promise<ResponseSuccess | ResponseError> {
     try {
-      const user: UserDB = await this.authSevice.register(RegisterDTO);
+      const user: UserDocument = await this.authSevice.register(RegisterDTO);
       return new ResponseSuccess('REGISTER.SUCCESS', { user });
     } catch (error: any) {
       return new ResponseError('REGISTER.ERROR', error);
@@ -98,7 +99,7 @@ export class AuthController {
     @Body() UserDTO: LoginDTO,
   ): Promise<ResponseSuccess | ResponseError> {
     try {
-      const response: { token: IToken; user: UserDB } =
+      const response: { token: IToken; user: UserDocument } =
         await this.authSevice.login(UserDTO);
       return new ResponseSuccess('LOGIN.SECCESS', response);
     } catch (error: any) {

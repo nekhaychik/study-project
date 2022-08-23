@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 // Controllers
 import { AppController } from './app.controller';
@@ -12,13 +13,20 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CronModule } from './cron/cron.module';
 
-const HOST: string = process.env.MONGODB_HOST || 'localhost';
-const PORT: string = process.env.MONGODB_PORT || '27018';
-const DATABASE: string = process.env.MONGODB_DATABASE || 'study-project';
-const URI = `mongodb://${HOST}:${PORT}/${DATABASE}`;
-
 @Module({
-  imports: [MongooseModule.forRoot(URI), UserModule, AuthModule, CronModule],
+  imports: [
+    ConfigModule.forRoot(),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_URI'), // Loaded from .ENV
+      }),
+    }),
+    UserModule,
+    AuthModule,
+    CronModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

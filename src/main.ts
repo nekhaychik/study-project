@@ -5,13 +5,18 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // Modules
 import { AppModule } from './app.module';
 
+// Services
+import { CronService } from './cron/cron.service';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
-import './common/cron';
-
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
+
+  // dump database
+  const cron = new CronService();
+  cron.dumpDB();
 
   const config = new DocumentBuilder()
     .setTitle('Study Project')

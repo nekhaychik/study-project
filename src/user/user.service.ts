@@ -9,6 +9,8 @@ import { RegisterDTO } from '../auth/dto/register.dto';
 
 // Interfaces
 import { Payload } from 'src/auth/interfaces/jwt-payload.interface';
+
+// Schemas
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()

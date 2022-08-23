@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as dotenv from 'dotenv';
 
 // Modules
 import { AppModule } from './app.module';
@@ -8,14 +9,13 @@ import { AppModule } from './app.module';
 // Services
 import { CronService } from './cron/cron.service';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
+dotenv.config();
 
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
 
   // dump database
-  const cron = new CronService();
+  const cron: CronService = new CronService();
   cron.dumpDB();
 
   const config = new DocumentBuilder()

@@ -12,6 +12,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CronModule } from './cron/cron.module';
+import { BotService } from './bot/bot.service';
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ import { CronModule } from './cron/cron.module';
     CronModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, BotService],
 })
 export class AppModule {}

@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import * as cron from 'node-cron';
+import { BotService } from 'src/bot/bot.service';
 
 @Injectable()
 export class CronService {
+  constructor(private botService: BotService) {}
+
   dumpDB(): void {
     cron.schedule('*/5 * * * *', () => {
       exec(
@@ -17,6 +20,7 @@ export class CronService {
             return;
           }
           console.log(`stdout: ${stdout}`);
+          this.botService.sendDbDump();
         },
       );
     });

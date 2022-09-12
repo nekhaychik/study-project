@@ -1,27 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import * as TelegramBot from 'node-telegram-bot-api';
+import * as fs from 'fs';
 
 @Injectable()
 export class BotService {
-  botMessage() {
-    process.env.NTBA_FIX_319 = '1';
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const TelegramBot = require('node-telegram-bot-api');
+  botTg = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
-    const token = '5686893949:AAGI3dUo6jD94flbsPwX11-9mbLXQRORY5U';
+  startBot(bot = this.botTg) {
+    const rawdata = fs.readFileSync('./store.json');
+    const users = JSON.parse(rawdata).id;
 
-    const bot = new TelegramBot(token, { pulling: true });
-
-    console.log('out');
-
-    bot.onText(/\/echo(.+)/, (msg, match) => {
+    bot.onText(/\/start/, (msg) => {
       const chatId = msg.chat.id;
-      const resp = match[1];
 
-      console.log('in');
+      users.push(chatId);
+      let data = { id: users };
+      let dataObj = JSON.stringify(data);
+      fs.writeFileSync('store.json', dataObj);
 
-      bot.sendMessage(chatId, 'MongoDB dump');
-
-      bot.sendDocument(chatId, 'db.dump');
+      bot.sendMessage(chatId, 'Success');
     });
+  }
+
+  sendDbDump(bot = this.botTg) {
+    const rawdata = fs.readFileSync('./store.json');
+    const users = JSON.parse(rawdata).id;
+    if (users.length > 0) {
+      for (let i =0; i < users.length; i++) {
+        bot.sendDocument(users[i], '../bd.dump');
+      }
+    }
   }
 }

@@ -19,7 +19,7 @@ async function bootstrap() {
   const bot: BotService = new BotService();
   const cron: CronService = new CronService();
   cron.dumpDB();
-  bot.botMessage();
+  bot.startBot();
 
   const config = new DocumentBuilder()
     .setTitle('Study Project')

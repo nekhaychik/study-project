@@ -8,14 +8,14 @@ export class BotService {
 
   startBot(bot = this.botTg) {
     const rawdata = fs.readFileSync('./store.json');
-    const users = JSON.parse(rawdata).id;
+    const users = JSON.parse(rawdata.toString()).id;
 
     bot.onText(/\/start/, (msg) => {
       const chatId = msg.chat.id;
 
       users.push(chatId);
-      let data = { id: users };
-      let dataObj = JSON.stringify(data);
+      const data = { id: users };
+      const dataObj = JSON.stringify(data);
       fs.writeFileSync('store.json', dataObj);
 
       bot.sendMessage(chatId, 'Success');
@@ -23,10 +23,10 @@ export class BotService {
   }
 
   sendDbDump(bot = this.botTg) {
-    const rawdata = fs.readFileSync('./store.json');
+    const rawdata = fs.readFileSync('./store.json').toString();
     const users = JSON.parse(rawdata).id;
     if (users.length > 0) {
-      for (let i =0; i < users.length; i++) {
+      for (let i = 0; i < users.length; i++) {
         bot.sendDocument(users[i], '../bd.dump');
       }
     }

@@ -11,10 +11,4 @@ export class AppController {
     private readonly appService: AppService,
     private botService: BotService,
   ) {}
-
-  @Get()
-  getBotDialog(@Res() res) {
-    this.botService.botMessage();
-    res.status(HttpStatus.OK).send('Bot service started');
-  }
 }

@@ -17,7 +17,7 @@ async function bootstrap() {
 
   // dump database
   const bot: BotService = new BotService();
-  const cron: CronService = new CronService();
+  const cron: CronService = new CronService(bot);
   cron.dumpDB();
   bot.startBot();
 

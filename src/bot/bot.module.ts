@@ -6,4 +6,4 @@ import { BotService } from './bot.service';
   imports: [ConfigModule],
   providers: [BotService],
 })
-export class AppModule {}
+export class BotModule {}

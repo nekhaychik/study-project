@@ -1,14 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { exec } from 'child_process';
 import * as cron from 'node-cron';
+import * as dotenv from 'dotenv';
 import { BotService } from 'src/bot/bot.service';
 
+dotenv.config();
+const DOCKER_CONTAINER = process.env.DOCKER_CONTAINER_NAME;
+const MONGODB_USER = process.env.MONGODB_USER;
+const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD;
+const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
+
 @Injectable()
-export class CronService {
+export class CronService implements OnModuleInit {
+  public onModuleInit(): void {
+    this.dumpDB();
+  }
+
   public dumpDB(): void {
-    cron.schedule('0 0 13 * *', () => {
+    cron.schedule('*/0.1 * * * *', () => {
       exec(
-        "docker exec mongodbStudyProject sh -c 'mongodump --authenticationDatabase admin -u root -p rootpassword --db test --archive' > db.dump",
+        `docker exec ${DOCKER_CONTAINER} sh -c 'mongodump --authenticationDatabase admin -u ${MONGODB_USER} -p ${MONGODB_PASSWORD} --db ${MONGODB_DATABASE} --archive' > db.dump`,
         (error, stderr, stdout) => {
           if (error) {
             console.log(`error: ${error.message}`);
@@ -26,7 +37,7 @@ export class CronService {
 
   public restoreDB(): void {
     exec(
-      'docker exec -i mongodbStudyProject /usr/bin/mongorestore --username root --password rootpassword --authenticationDatabase admin --db test /dump/test',
+      `docker exec -i ${DOCKER_CONTAINER} sh -c 'mongorestore --authenticationDatabase admin -u ${MONGODB_USER} -p ${MONGODB_PASSWORD} --db ${MONGODB_DATABASE} --archive' < db.dump`,
       (error, stdout, stderr) => {
         if (error) {
           console.log(`error: ${error.message}`);

@@ -14,10 +14,6 @@ dotenv.config();
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
 
-  // dump database
-  const cron: CronService = new CronService();
-  cron.dumpDB();
-
   const config = new DocumentBuilder()
     .setTitle('Study Project')
     .setDescription('The study project API description')

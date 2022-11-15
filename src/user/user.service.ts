@@ -4,8 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 // DTO
-import { LoginDTO } from 'src/auth/dto/login.dto';
-import { RegisterDTO } from '../auth/dto/register.dto';
+import { LoginDto } from 'src/auth/dto/login.dto';
+import { RegisterDto } from '../auth/dto/register.dto';
 
 // Interfaces
 import { Payload } from 'src/auth/interfaces/jwt-payload.interface';
@@ -17,7 +17,7 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  public async create(RegisterDTO: RegisterDTO): Promise<UserDocument> {
+  public async create(RegisterDTO: RegisterDto): Promise<UserDocument> {
     const { email } = RegisterDTO;
     const user: UserDocument = await this.userModel.findOne({ email });
     if (user) {
@@ -36,7 +36,7 @@ export class UserService {
     return await this.userModel.findOne({ email });
   }
 
-  public async findByLogin(UserDTO: LoginDTO): Promise<UserDocument> {
+  public async findByLogin(UserDTO: LoginDto): Promise<UserDocument> {
     const { email, password } = UserDTO;
     const user: UserDocument = await this.userModel.findOne({ email });
     if (!user) {

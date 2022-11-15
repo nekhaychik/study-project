@@ -12,8 +12,8 @@ import { MailService } from './mail.service';
 import { JWTService } from './jwt.service';
 
 // DTO
-import { LoginDTO } from './dto/login.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 // Schemas
 import { User, UserDocument } from 'src/user/schemas/user.schema';
@@ -34,14 +34,14 @@ export class AuthService {
   ) {}
 
   public async login(
-    UserDTO: LoginDTO,
+    UserDTO: LoginDto,
   ): Promise<{ token: IToken; user: UserDocument }> {
     const userDB: UserDocument = await this.userService.findByLogin(UserDTO);
     const token: IToken = await this.jwtService.createToken(UserDTO.email);
     return { token, user: userDB };
   }
 
-  public async register(UserDTO: RegisterDTO): Promise<UserDocument> {
+  public async register(UserDTO: RegisterDto): Promise<UserDocument> {
     const newUser: UserDocument = await this.userService.create(UserDTO);
     return newUser;
   }

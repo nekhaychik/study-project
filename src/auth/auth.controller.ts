@@ -19,9 +19,9 @@ import {
 } from '@nestjs/swagger';
 
 // DTO
-import { LoginDTO } from './dto/login.dto';
+import { LoginDto } from './dto/login.dto';
 import { ResponseError, ResponseSuccess } from 'src/common/dto/response.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { RegisterDto } from './dto/register.dto';
 
 // Services
 import { AuthService } from './auth.service';
@@ -53,7 +53,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiBody({ type: [RegisterDTO] })
+  @ApiBody({ type: [RegisterDto] })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
@@ -66,7 +66,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   public async register(
-    @Body() RegisterDTO: RegisterDTO,
+    @Body() RegisterDTO: RegisterDto,
   ): Promise<ResponseSuccess | ResponseError> {
     try {
       const user: UserDocument = await this.authSevice.register(RegisterDTO);
@@ -78,7 +78,7 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'User login' })
-  @ApiBody({ type: [LoginDTO] })
+  @ApiBody({ type: [LoginDto] })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
@@ -96,7 +96,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   public async login(
-    @Body() UserDTO: LoginDTO,
+    @Body() UserDTO: LoginDto,
   ): Promise<ResponseSuccess | ResponseError> {
     try {
       const response: { token: IToken; user: UserDocument } =

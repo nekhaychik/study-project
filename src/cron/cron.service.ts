@@ -5,13 +5,11 @@ import { BotService } from 'src/bot/bot.service';
 
 @Injectable()
 export class CronService {
-  constructor(private botService: BotService) {}
-
-  dumpDB(): void {
-    cron.schedule('*/5 * * * *', () => {
+  public dumpDB(): void {
+    cron.schedule('0 0 13 * *', () => {
       exec(
-        "docker exec mymongodb sh -c 'mongodump --archive' > db.dump",
-        (error, stdout, stderr) => {
+        "docker exec mongodbStudyProject sh -c 'mongodump --authenticationDatabase admin -u root -p rootpassword --db test --archive' > db.dump",
+        (error, stderr, stdout) => {
           if (error) {
             console.log(`error: ${error.message}`);
           }
@@ -20,15 +18,15 @@ export class CronService {
             return;
           }
           console.log(`stdout: ${stdout}`);
-          this.botService.sendDbDump();
+          BotService.sendDbDump();
         },
       );
     });
   }
 
-  restoreDB(): void {
+  public restoreDB(): void {
     exec(
-      "docker exec -i mymongodb sh -c 'mongorestore --archive < db.dump",
+      'docker exec -i mongodbStudyProject /usr/bin/mongorestore --username root --password rootpassword --authenticationDatabase admin --db test /dump/test',
       (error, stdout, stderr) => {
         if (error) {
           console.log(`error: ${error.message}`);

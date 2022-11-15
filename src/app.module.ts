@@ -2,12 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-// Controllers
-import { AppController } from './app.controller';
-
-// Services
-import { AppService } from './app.service';
-
 // Modules
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -28,7 +22,7 @@ import { BotService } from './bot/bot.service';
     AuthModule,
     CronModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, BotService],
+  controllers: [],
+  providers: [BotService],
 })
 export class AppModule {}

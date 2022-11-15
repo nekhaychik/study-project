@@ -5,7 +5,6 @@ import * as dotenv from 'dotenv';
 
 // Modules
 import { AppModule } from './app.module';
-import { BotService } from './bot/bot.service';
 
 // Services
 import { CronService } from './cron/cron.service';
@@ -16,10 +15,8 @@ async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
 
   // dump database
-  const bot: BotService = new BotService();
-  const cron: CronService = new CronService(bot);
+  const cron: CronService = new CronService();
   cron.dumpDB();
-  bot.startBot();
 
   const config = new DocumentBuilder()
     .setTitle('Study Project')

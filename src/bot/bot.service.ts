@@ -15,26 +15,26 @@ const COMMAND = process.env.COMMAND;
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private static botTg;
+  private static botTg: TelegramBot;
 
-  constructor() {
+  public constructor() {
     BotService.botTg = new TelegramBot(TG_TOKEN, {
       polling: true,
     });
   }
 
-  public onModuleInit() {
+  public onModuleInit(): void {
     this.startBot();
     this.restart();
     this.dump();
     this.logs();
   }
 
-  public startBot() {
-    const rawdata = fs.readFileSync('./store.json').toString();
-    const users = JSON.parse(rawdata).id;
-
+  public startBot(): void {
     BotService.botTg.onText(/\/start/, (msg) => {
+      const rawdata = fs.readFileSync('./store.json').toString();
+      const users = JSON.parse(rawdata).id;
+
       const chatId = msg.chat.id;
 
       if (!users.find((id) => id === chatId)) {
@@ -43,14 +43,14 @@ export class BotService implements OnModuleInit {
         const dataObj = JSON.stringify(data);
         fs.writeFileSync('store.json', dataObj);
 
-        BotService.botTg.sendMessage(chatId, 'New');
+        BotService.botTg.sendMessage(chatId, 'Hello new user!');
       } else {
-        BotService.botTg.sendMessage(chatId, 'Old');
+        BotService.botTg.sendMessage(chatId, 'Hello old user!');
       }
     });
   }
 
-  public restart() {
+  public restart(): void {
     BotService.botTg.onText(/\/restart/, (msg) => {
       this.command();
       const chatId = msg.chat.id;
@@ -58,7 +58,7 @@ export class BotService implements OnModuleInit {
     });
   }
 
-  public logs() {
+  public logs(): void {
     this.createLogsFile();
     BotService.botTg.onText(/\/logs/, (msg) => {
       const chatId = msg.chat.id;
@@ -66,16 +66,15 @@ export class BotService implements OnModuleInit {
     });
   }
 
-  public dump() {
+  public dump(): void {
     this.dumpBD();
-
     BotService.botTg.onText(/\/dump/, (msg) => {
       const chatId = msg.chat.id;
       BotService.botTg.sendDocument(chatId, './db.dump');
     });
   }
 
-  public static sendDbDump() {
+  public static sendDbDump(): void {
     const rawdata = fs.readFileSync('./store.json').toString();
     const users = JSON.parse(rawdata).id;
     if (users.length > 0) {
@@ -85,7 +84,7 @@ export class BotService implements OnModuleInit {
     }
   }
 
-  private dumpBD() {
+  private dumpBD(): void {
     exec(
       `docker exec ${DOCKER_CONTAINER} sh -c 'mongodump --authenticationDatabase admin -u ${MONGODB_USER} -p ${MONGODB_PASSWORD} --db ${MONGODB_DATABASE} --archive' > db.dump`,
       (error, stderr, stdout) => {
@@ -101,7 +100,7 @@ export class BotService implements OnModuleInit {
     );
   }
 
-  private createLogsFile() {
+  private createLogsFile(): void {
     exec(
       `docker logs -f ${DOCKER_CONTAINER} > docker.log`,
       (error, stderr, stdout) => {
@@ -117,7 +116,7 @@ export class BotService implements OnModuleInit {
     );
   }
 
-  private command() {
+  private command(): void {
     exec(`${COMMAND}`, (error, stderr, stdout) => {
       if (error) {
         console.log(`error: ${error.message}`);

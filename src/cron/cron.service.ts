@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { exec } from 'child_process';
 import * as cron from 'node-cron';
 import * as dotenv from 'dotenv';
+
+// Services
 import { BotService } from 'src/bot/bot.service';
 
 dotenv.config();
@@ -17,7 +19,7 @@ export class CronService implements OnModuleInit {
   }
 
   public dumpDB(): void {
-    cron.schedule('*/1 * * * *', () => {
+    cron.schedule('0 0 13 * *', () => {
       exec(
         `docker exec ${DOCKER_CONTAINER} sh -c 'mongodump --authenticationDatabase admin -u ${MONGODB_USER} -p ${MONGODB_PASSWORD} --db ${MONGODB_DATABASE} --archive' > db.dump`,
         (error, stderr, stdout) => {

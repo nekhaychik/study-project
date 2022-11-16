@@ -6,9 +6,6 @@ import * as dotenv from 'dotenv';
 // Modules
 import { AppModule } from './app.module';
 
-// Services
-import { CronService } from './cron/cron.service';
-
 dotenv.config();
 
 async function bootstrap() {

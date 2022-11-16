@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CronModule } from './cron/cron.module';
-import { BotService } from './bot/bot.service';
+import { BotModule } from './bot/bot.module';
 
 @Module({
   imports: [
@@ -21,8 +21,9 @@ import { BotService } from './bot/bot.service';
     UserModule,
     AuthModule,
     CronModule,
+    BotModule,
   ],
   controllers: [],
-  providers: [BotService],
+  providers: [],
 })
 export class AppModule {}

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BotService } from 'src/bot/bot.service';
+import { BotModule } from 'src/bot/bot.module';
 
 // Services
 import { CronService } from './cron.service';
 
 @Module({
-  imports: [],
-  providers: [CronService, BotService],
+  imports: [BotModule],
+  providers: [CronService],
   exports: [CronService],
 })
 export class CronModule {}

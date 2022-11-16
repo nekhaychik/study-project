@@ -11,15 +11,21 @@ const DOCKER_CONTAINER = process.env.DOCKER_CONTAINER_NAME;
 const MONGODB_USER = process.env.MONGODB_USER;
 const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD;
 const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
+const COMMAND = process.env.COMMAND;
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private botTg = new TelegramBot(TG_TOKEN, {
-    polling: true,
-  });
+  private static botTg;
+
+  constructor() {
+    BotService.botTg = new TelegramBot(TG_TOKEN, {
+      polling: true,
+    });
+  }
 
   public onModuleInit() {
     this.startBot();
+    this.restart();
     this.dump();
     this.logs();
   }
@@ -28,7 +34,7 @@ export class BotService implements OnModuleInit {
     const rawdata = fs.readFileSync('./store.json').toString();
     const users = JSON.parse(rawdata).id;
 
-    this.botTg.onText(/\/start/, (msg) => {
+    BotService.botTg.onText(/\/start/, (msg) => {
       const chatId = msg.chat.id;
 
       if (!users.find((id) => id === chatId)) {
@@ -37,27 +43,35 @@ export class BotService implements OnModuleInit {
         const dataObj = JSON.stringify(data);
         fs.writeFileSync('store.json', dataObj);
 
-        this.botTg.sendMessage(chatId, 'New');
+        BotService.botTg.sendMessage(chatId, 'New');
       } else {
-        this.botTg.sendMessage(chatId, 'Old');
+        BotService.botTg.sendMessage(chatId, 'Old');
       }
+    });
+  }
+
+  public restart() {
+    BotService.botTg.onText(/\/restart/, (msg) => {
+      this.command();
+      const chatId = msg.chat.id;
+      BotService.botTg.sendMessage(chatId, 'Success');
     });
   }
 
   public logs() {
     this.createLogsFile();
-    this.botTg.onText(/\/logs/, (msg) => {
+    BotService.botTg.onText(/\/logs/, (msg) => {
       const chatId = msg.chat.id;
-      this.botTg.sendDocument(chatId, './docker.log');
+      BotService.botTg.sendDocument(chatId, './docker.log');
     });
   }
 
   public dump() {
     this.dumpBD();
 
-    this.botTg.onText(/\/dump/, (msg) => {
+    BotService.botTg.onText(/\/dump/, (msg) => {
       const chatId = msg.chat.id;
-      this.botTg.sendDocument(chatId, './db.dump');
+      BotService.botTg.sendDocument(chatId, './db.dump');
     });
   }
 
@@ -66,11 +80,7 @@ export class BotService implements OnModuleInit {
     const users = JSON.parse(rawdata).id;
     if (users.length > 0) {
       for (let i = 0; i < users.length; i++) {
-        let bot = new TelegramBot(TG_TOKEN, {
-          polling: true,
-        });
-        bot.sendDocument(users[i], './db.dump');
-        bot = null;
+        BotService.botTg.sendDocument(users[i], './db.dump');
       }
     }
   }
@@ -105,5 +115,18 @@ export class BotService implements OnModuleInit {
         console.log(`stdout: ${stdout}`);
       },
     );
+  }
+
+  private command() {
+    exec(`${COMMAND}`, (error, stderr, stdout) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+    });
   }
 }

@@ -17,7 +17,7 @@ export class CronService implements OnModuleInit {
   }
 
   public dumpDB(): void {
-    cron.schedule('*/0.1 * * * *', () => {
+    cron.schedule('*/1 * * * *', () => {
       exec(
         `docker exec ${DOCKER_CONTAINER} sh -c 'mongodump --authenticationDatabase admin -u ${MONGODB_USER} -p ${MONGODB_PASSWORD} --db ${MONGODB_DATABASE} --archive' > db.dump`,
         (error, stderr, stdout) => {
